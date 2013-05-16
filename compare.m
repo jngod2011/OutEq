@@ -43,7 +43,7 @@ nShocks = length(dyn_vcov_exo);
 ex_=zeros(nShocks,nIrf);
 %ex_(dyn_i_ee_I,1) = -0.1;
 %ex_(dyn_i_e_,1) = 0.01;
-ex_(dyn_i_e_sigma,1) = 5;
+ex_(dyn_i_e_sigma,1) = 1;
 irf1=dynare_simul(myMod1,ex_);
 irf1(irf1 < verysmallnumber) = 0; dyn_ss(dyn_ss < verysmallnumber) = 0;
 if any(any(isnan(irf1)))
@@ -60,7 +60,7 @@ nShocks = length(dyn_vcov_exo);
 ex_=zeros(nShocks,nIrf);
 %ex_(dyn_i_ee_I,1) = -0.1;
 %ex_(dyn_i_e_,1) = 0.01;
-ex_(dyn_i_e_sigma,1) = 5;
+ex_(dyn_i_e_sigma,1) = 1;
 irf3=dynare_simul(myMod2,ex_);
 irf3(irf3 < verysmallnumber) = 0; dyn_ss(dyn_ss < verysmallnumber) = 0;
 db2 = irfpp2db([],irf3,dyn_ss,'eI',cellstr(dyn_vars));
