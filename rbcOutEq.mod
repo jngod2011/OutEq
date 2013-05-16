@@ -168,8 +168,6 @@ model;
   G = (pH/dp)*(etae*bstar/(etab*(1+rd))) + (1+pH/dp)*cstar - rhobhat 
     + (kappa0e*(exp(kappa1e*phie)-1) - 1 + etaw/etab)*phie 
     + (kappa0b*(exp(kappa1b*phib)-1) - 1 + 1/Qbhat)*phib;
-//    + (kappa0e*kappa1e*exp(kappa1e*phie) - 1 + etaw/etab)*phie 
-//    + (kappa0b*kappa1b*exp(kappa1b*phib) - 1 + 1/Qbhat)*phib;
   I = M/G;
   rhobhat = pH*q*R*(1+s)/(etab*(1+rd))-1;  // note that there is no Rstar
   ve = beta*(((rK(+1)+(1-delta)*q(+1))/q)*(mU(+1)/mU)*(lambdae+(1-lambdae)*(1+retilde(+1))*ve(+1)));
@@ -182,8 +180,8 @@ model;
   1 + ratilde = ((1+rd)*(pH/dp)*cstar*(A + N)/(A*G))*(1 + (PI-etaw*phie)*(1+e_I(+1)-1/etab)/((pH/dp)*cstar + phib/Qbhat));
   M = A + N;
   omega = N/M;
-  M = (1+rd)*(pH/dp)*(M(-1)/G)*((rK + (1-delta)*q(+1))/q)*((1-lambdae)*etae*(bstar/(1+rd))*(1+e_I) + (1-lambdab)*cstar*(1 + (PI - etaw*phie)*(1+e_I-1/etab)/((pH/dp)*cstar + phib/Qbhat)));
-  omega = (1-lambdae)*etae*(bstar/(1+rd))*(1+e_I)/((1-lambdae)*etae*(bstar/(1+rd))*(1+e_I)+(1-lambdab)*cstar*(1 + (PI - etaw*phie)*(1+e_I-1/etab)/((pH/dp)*cstar + phib/Qbhat)));
+  M = (1+rd(-1))*(pH/dp)*(M(-1)/G(-1))*((rK + (1-delta)*q)/q(-1))*((1-lambdae)*etae(-1)*(bstar/(1+rd(-1)))*(1+e_I) + (1-lambdab)*cstar*(1 + (PI(-1) - etaw(-1)*phie(-1))*(1+e_I-1/etab(-1))/((pH/dp)*cstar + phib(-1)/Qbhat(-1))));
+  omega = (1-lambdae)*etae(-1)*(bstar/(1+rd(-1)))*(1+e_I)/((1-lambdae)*etae(-1)*(bstar/(1+rd(-1)))*(1+e_I)+(1-lambdab)*cstar*(1 + (PI(-1) - etaw(-1)*phie(-1))*(1+e_I-1/etab(-1))/((pH/dp)*cstar + phib(-1)/Qbhat(-1))));
 end;
 
 initval; //  this is the analytical steady state
