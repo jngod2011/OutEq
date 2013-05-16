@@ -52,6 +52,8 @@ end;
 db1 = irfpp2db([],irf1,dyn_ss,'eI',cellstr(dyn_vars));
 db1diff = irfpp2db([],irf1,dyn_ss,'eI',cellstr(dyn_vars),'relative',false);
 ss1 = dyn_ss;
+disp('Deterministic Stoch. fix-point Uncoditional mean');
+horzcat(cellstr(dyn_vars),num2cell([dyn_steady_states dyn_ss dyn_mean]))
 %% Next scenario
 clear dyn* ex_;
 load(myMod2);
