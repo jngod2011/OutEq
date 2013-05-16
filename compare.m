@@ -19,16 +19,17 @@ plotName = 'OutEq_Vola_Shock';
 legendtxt = {'RBC with H&T and outside equity'; 'RBC'};
 % list of variables to be plotted
 % list of variables where percent from the steady-state is computed
-myList = {'Y','I','C','A','N','q','ve','vb','w','L','etab','etae','etaw','phib','phie','Z'};
+myList = {'Y','I','C','A','N','q','ve','vb','vw','w','L','etab','etae','etaw','phib','phie','Z'};
 myListLabels = {'"Output" Y','"Investments" I','"Consumption" C','"Bank capital" A',...
   '"Entrepreneurial capital" N','"$q$" q','"$v^e$" ve',...
-  '"$v^b$" vb','"Real wages" w','"Hours" L',...
+  '"$v^b$" vb','"$v^w$" vw','"Real wages" w','"Hours" L',...
   '"$\eta^b$" etab','"$\eta^e$" etae','"$\eta^w$" etaw',...
-  '"$\phi_t^b$" phib','"$\phi_t^e$" phie','"Technology shock, $Z_t$" Z'};
+  '"Technology shock, $Z_t$" Z'};
 % list of variables, where the difference is computed
-myDiffList = {'retilde','ratilde','e_I','etab','etae','etaw'};
+myDiffList = {'retilde','ratilde','e_I','etab','etae','etaw','phib','phie'};
 myDiffListLabels = {'"$\tilde r^e$" retilde','"$\tilde r^a$" ratilde',...
-  '"Investment shock" e_I','"$\eta^b$" etab','"$\eta^e$" etae','"$\eta^w$" etaw'};
+  '"Investment shock" e_I','"$\eta^b$" etab','"$\eta^e$" etae','"$\eta^w$" etaw','"$\phi_t^b$" phib','"$\phi_t^e$" phie',};
+verysmallnumber = 1e-12;
 %% run dynare++ if needed
 if rundynarepp
   system('dynare++ --no-irfs rbc.mod','-echo');
@@ -44,13 +45,13 @@ ex_=zeros(nShocks,nIrf);
 %ex_(dyn_i_e_,1) = 0.01;
 ex_(dyn_i_e_sigma,1) = 5;
 irf1=dynare_simul(myMod1,ex_);
+irf1(irf1 < verysmallnumber) = 0; dyn_ss(dyn_ss < verysmallnumber) = 0;
 if any(any(isnan(irf1)))
   error('Explosive system');
 end;
 db1 = irfpp2db([],irf1,dyn_ss,'eI',cellstr(dyn_vars));
 db1diff = irfpp2db([],irf1,dyn_ss,'eI',cellstr(dyn_vars),'relative',false);
 ss1 = dyn_ss;
-keyboard;
 %% Next scenario
 clear dyn* ex_;
 load(myMod2);
@@ -61,6 +62,7 @@ ex_=zeros(nShocks,nIrf);
 %ex_(dyn_i_e_,1) = 0.01;
 ex_(dyn_i_e_sigma,1) = 5;
 irf3=dynare_simul(myMod2,ex_);
+irf3(irf3 < verysmallnumber) = 0; dyn_ss(dyn_ss < verysmallnumber) = 0;
 db2 = irfpp2db([],irf3,dyn_ss,'eI',cellstr(dyn_vars));
 db2diff = irfpp2db([],irf3,dyn_ss,'eI',cellstr(dyn_vars),'relative',false);
 % concatenate the dbases of the above simulations

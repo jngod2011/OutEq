@@ -144,10 +144,6 @@ s = ((pH/dp)*(1 - ((1-lambdae)/beta))*bstar + (pH/dp)*(1 - ((1-lambdab)/beta))*c
 rhobhatbar =   (pH/dp)*(1 - ((1-lambdae)/beta))*bstar + (pH/dp)*(1 - ((1-lambdab)/beta))*cstar + cstar;
 Rstar = R*(1+rhobhatbar)/(1+cstar);
 
-
-
-
-
 // 
 //  Model code: start equation at line x1 in order to be able to map the
 //  equation numbers that dynare gives with the code below
@@ -156,12 +152,12 @@ model;
   mU = beta*mU(+1)*((q(+1)*(1-delta) + rK(+1))/q); 
   Z = rho*Z(-1) + e_; 
   log(Zc)=rhoc*log(Zc(-1)) + e_c; 
-  Y = K(-1)^alpha*(exp(Z)*L)^(1-alpha); 
-  rK/w = (alpha/(1-alpha))*L/K(-1); 
-  rK = alpha*Y/K(-1);
+  Y = K^alpha*(exp(Z)*L)^(1-alpha); 
+  rK/w = (alpha/(1-alpha))*L/K; 
+  rK = alpha*Y/K;
   K = (1-delta)*K(-1) + I*(1+e_I); 
   L = (w*mU/ksi)^(1/fi);
-  (C + I) = Y; // 10 
+  C + (1+cstar)*I = Y; // 10 
   sigma_I = (1-rho_eI) + rho_eI*sigma_I(-1) + e_sigma; 
   e_I=sigma_I*ee_I;
   rd = 0;
@@ -179,9 +175,9 @@ model;
   ve = beta*(((rK(+1)+(1-delta)*q(+1))/q)*(mU(+1)/mU)*(lambdae+(1-lambdae)*(1+retilde(+1))*ve(+1)));
   vb = beta*(((rK(+1)+(1-delta)*q(+1))/q)*(mU(+1)/mU)*(lambdab+(1-lambdab)*(1+ratilde(+1))*vb(+1)));
   vw = beta*((rK(+1)+(1-delta)*q(+1))/q)*(mU(+1)/mU);
-  (1+e_I(+1))*ve(+1)*etae = ve(+1);
-  (1+e_I(+1))*vb(+1)*etab = vb(+1);
-  (1+e_I(+1))*vw(+1)*etaw = vw(+1);
+  etae*(1+e_I(+1))*beta*(((rK(+1)+(1-delta)*q(+1))/q)*(mU(+1)/mU)*(lambdae+(1-lambdae)*(1+retilde(+1))*ve(+1))) = ve;
+  etab*(1+e_I(+1))*beta*(((rK(+1)+(1-delta)*q(+1))/q)*(mU(+1)/mU)*(lambdab+(1-lambdab)*(1+ratilde(+1))*vb(+1))) = vb;
+  etaw*(1+e_I(+1))*beta*((rK(+1)+(1-delta)*q(+1))/q)*(mU(+1)/mU) = vw;
   1 + retilde = etae*(pH/dp)*(bstar/G)*(A + N)*(1+e_I(+1))/N;
   1 + ratilde = ((1+rd)*(pH/dp)*cstar*(A + N)/(A*G))*(1 + (PI-etaw*phie)*(1+e_I(+1)-1/etab)/((pH/dp)*cstar + phib/Qbhat));
   M = A + N;
