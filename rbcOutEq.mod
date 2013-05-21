@@ -196,7 +196,7 @@ model;
     + (kappa0e*(exp(kappa1e*phie)-1) - 1 + etaw/etab)*phie 
     + (kappa0b*(exp(kappa1b*phib)-1) - 1 + 1/Qbhat)*phib;
   I = M/G;
-  rhobhat = pH*q*Rstar/(etab*(1+rd))-1;  //% note that there is no Rstar
+  rhobhat = pH*q*Rstar/(etab*(1+rd))-1;  
   ve = beta*(((rK(+1)+(1-delta)*q(+1))/q)*(mU(+1)/mU)*(lambdae+(1-lambdae)*(1+retilde(+1))*ve(+1)));
   vb = beta*(((rK(+1)+(1-delta)*q(+1))/q)*(mU(+1)/mU)*(lambdab+(1-lambdab)*(1+ratilde(+1))*vb(+1)));
   vw = beta*((rK(+1)+(1-delta)*q(+1))/q)*(mU(+1)/mU);
@@ -207,8 +207,6 @@ model;
   1 + ratilde = ((1+rd)*(pH/dp)*cstar*M/(A*G))*(1 + (PI-etaw*phie)*(1+e_I(+1)-1/etab)/((pH/dp)*cstar + phib/Qbhat));
   N=omega*M;
   A=(1-omega)*M;
-  //%M = A + N;
-  //%omega = N/M;
   M = (1+rd(-1))*(pH/dp)*(M(-1)/G(-1))*((rK + (1-delta)*q)/q(-1))*((1-lambdae)*etae(-1)*(bstar/(1+rd(-1)))*(1+e_I) + (1-lambdab)*cstar*(1 + (PI(-1) - etaw(-1)*phie(-1))*(1+e_I-1/etab(-1))/((pH/dp)*cstar + phib(-1)/Qbhat(-1))));
   omega = (1-lambdae)*etae(-1)*(bstar/(1+rd(-1)))*(1+e_I)/((1-lambdae)*etae(-1)*(bstar/(1+rd(-1)))*(1+e_I)+(1-lambdab)*cstar*(1 + (PI(-1) - etaw(-1)*phie(-1))*(1+e_I-1/etab(-1))/((pH/dp)*cstar + phib(-1)/Qbhat(-1))));
 end;
@@ -282,8 +280,8 @@ vcov = [0.0000168 0 0 0 ;
           0 0 .0005 0;
           0 0 0 0 ];
 order = 3;
-//% resid(1);
- //%steady(solve_algo = 1);
+resid(1);
+steady(solve_algo = 1);
 //% check;
 //% for i=1:length(oo_.steady_state);
 //%   fprintf(1,'%-s %10.6f\n',M_.endo_names(i,:),oo_.steady_state(i));
