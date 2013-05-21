@@ -73,6 +73,7 @@ parameters
   lambdae // firms' survival probability
   s // investment subsidy
   Rstar
+  rhobhatbar 
 ;
 
 
@@ -130,12 +131,18 @@ dp = pH*rdp;
 pL = pH - dp;
 R = 1/pH;
 bstar = 0.00815075;
+//cstar=0;
 cstar = 0.000825;
+//cstar=.04;
 // cstar = 0.825;
 kappa0e = 1;
 kappa0b = 1;
-kappa1e = 0.1;
-kappa1b = 0.1;
+kappa1e = 100;
+kappa1b = 100;
+
+
+// kappa1e = 10;
+// kappa1b = 5;
 // kappa0e = 0.24;
 // kappa0b = 0.002;
 // kappa1e = 7;
@@ -155,13 +162,13 @@ model;
   Y = K^alpha*(exp(Z)*L)^(1-alpha); 
   rK/w = (alpha/(1-alpha))*L/K; 
   rK = alpha*Y/K;
-  K = (1-delta)*K(-1) + I*(1+e_I); 
+  K = (1-delta)*K(-1) + pH*R*I(-1)*(1+e_I); 
   L = (w*mU/ksi)^(1/fi);
-  C + (1+cstar)*I = Y; // 10 
+  C + (1+cstar+kappa0b*(exp(kappa1b*phib)-1)*phib+kappa0e*(exp(kappa1e*phie)-1)*phie)*I = Y; // 10 
   sigma_I = (1-rho_eI) + rho_eI*sigma_I(-1) + e_sigma; 
-  e_I=sigma_I*ee_I;
+  e_I=  sigma_I*ee_I;
   rd = 0;
-  PI = pH*q*R/(1+rd) - pH*etae*bstar/(dp*(1+rd)); // (15)
+  PI = pH*q*Rstar/(1+rd) - pH*etae*bstar/(dp*(1+rd)); // (15)
   (1/etaw - 1/etab)*(PI - etaw*phie) = (pH*cstar/dp + phib/Qbhat)*(Qbhat-1);
      kappa0e*(exp(kappa1e*phie)-1) + kappa0e*kappa1e*exp(kappa1e*phie)*phie = 1 - etaw/etab;
      kappa0b*(exp(kappa1b*phib)-1) + kappa0b*kappa1b*exp(kappa1b*phib)*phib = (pH/dp)*cstar*(Qbhat - 1)/((pH/dp)*cstar*Qbhat + phib/Qbhat);
@@ -169,22 +176,25 @@ model;
     + (kappa0e*(exp(kappa1e*phie)-1) - 1 + etaw/etab)*phie 
     + (kappa0b*(exp(kappa1b*phib)-1) - 1 + 1/Qbhat)*phib;
   I = M/G;
-  rhobhat = pH*q*R*(1+s)/(etab*(1+rd))-1;  // note that there is no Rstar
+  rhobhat = pH*q*Rstar/(etab*(1+rd))-1;  // note that there is no Rstar
   ve = beta*(((rK(+1)+(1-delta)*q(+1))/q)*(mU(+1)/mU)*(lambdae+(1-lambdae)*(1+retilde(+1))*ve(+1)));
   vb = beta*(((rK(+1)+(1-delta)*q(+1))/q)*(mU(+1)/mU)*(lambdab+(1-lambdab)*(1+ratilde(+1))*vb(+1)));
   vw = beta*((rK(+1)+(1-delta)*q(+1))/q)*(mU(+1)/mU);
   etae*(1+e_I(+1))*beta*(((rK(+1)+(1-delta)*q(+1))/q)*(mU(+1)/mU)*(lambdae+(1-lambdae)*(1+retilde(+1))*ve(+1))) = ve;
   etab*(1+e_I(+1))*beta*(((rK(+1)+(1-delta)*q(+1))/q)*(mU(+1)/mU)*(lambdab+(1-lambdab)*(1+ratilde(+1))*vb(+1))) = vb;
   etaw*(1+e_I(+1))*beta*((rK(+1)+(1-delta)*q(+1))/q)*(mU(+1)/mU) = vw;
-  1 + retilde = etae*(pH/dp)*(bstar/G)*(A + N)*(1+e_I(+1))/N;
-  1 + ratilde = ((1+rd)*(pH/dp)*cstar*(A + N)/(A*G))*(1 + (PI-etaw*phie)*(1+e_I(+1)-1/etab)/((pH/dp)*cstar + phib/Qbhat));
-  M = A + N;
-  omega = N/M;
+  1 + retilde = etae*(pH/dp)*(bstar/G)*M*(1+e_I(+1))/N;
+  1 + ratilde = ((1+rd)*(pH/dp)*cstar*M/(A*G))*(1 + (PI-etaw*phie)*(1+e_I(+1)-1/etab)/((pH/dp)*cstar + phib/Qbhat));
+  N=omega*M;
+  A=(1-omega)*M;
+  //M = A + N;
+  //omega = N/M;
   M = (1+rd(-1))*(pH/dp)*(M(-1)/G(-1))*((rK + (1-delta)*q)/q(-1))*((1-lambdae)*etae(-1)*(bstar/(1+rd(-1)))*(1+e_I) + (1-lambdab)*cstar*(1 + (PI(-1) - etaw(-1)*phie(-1))*(1+e_I-1/etab(-1))/((pH/dp)*cstar + phib(-1)/Qbhat(-1))));
   omega = (1-lambdae)*etae(-1)*(bstar/(1+rd(-1)))*(1+e_I)/((1-lambdae)*etae(-1)*(bstar/(1+rd(-1)))*(1+e_I)+(1-lambdab)*cstar*(1 + (PI(-1) - etaw(-1)*phie(-1))*(1+e_I-1/etab(-1))/((pH/dp)*cstar + phib(-1)/Qbhat(-1))));
 end;
 
 initval; //  this is the analytical steady state
+//steady_state_model
   Z = 0; 
   Zc = 1;
   e_ = 0;
@@ -195,12 +205,13 @@ initval; //  this is the analytical steady state
   rhobhat = (pH/dp)*(1 - ((1-lambdae)/beta))*bstar + (pH/dp)*(1 - ((1-lambdab)/beta))*cstar + cstar;
   q = (1+cstar)/(pH*R);
 //  q = 1;
-  //  return to capital
+ 
   rK = q*(1/beta-1+delta);
   //  real wage
   w=(1-alpha)*(rK/alpha)^(-alpha/(1-alpha));
   //  capital stock
-  K =((1-alpha)/ksi)^(1/(sigma+fi))*(rK/alpha)^(-(alpha+fi)/((1-alpha)*(sigma+fi)))*(rK/alpha-delta)^(-sigma/(sigma+fi));
+  //K =((1-alpha)/ksi)^(1/(sigma+fi))*(rK/alpha)^(-(alpha+fi)/((1-alpha)*(sigma+fi)))*(rK/alpha-delta)^(-sigma/(sigma+fi));
+  K =((1-alpha)/ksi)^(1/(sigma+fi))*(rK/alpha)^(-(alpha+fi)/((1-alpha)*(sigma+fi)))*(rK/alpha-delta*(1+cstar)/(pH*R))^(-sigma/(sigma+fi));
   //  labour 
   L=K*(rK/alpha)^(1/(1-alpha));
   //  output
@@ -208,9 +219,10 @@ initval; //  this is the analytical steady state
   //  investments
   I = delta*K;
   //  insider wealth, J = A + N
-//  C = Y - (1+cstar)*I; // -I*chi/pH;
-  C = Y - I;
-  //  consumption of entrepreneurs
+ C = Y - (1+cstar)*I; 
+
+ // C = Y - I;
+  
   mU =C^(-sigma);
   G = (1/beta)*(pH/dp)*((1-lambdae)*bstar+(1-lambdab)*cstar);
   M = G*I;
@@ -228,28 +240,30 @@ initval; //  this is the analytical steady state
   rd = 0;
   phie = 0;
   phib = 0;
-  PI = pH*q*R/(1+rd) - pH*etae*bstar/(dp*(1+rd));
+  PI = pH*q*Rstar/(1+rd) - pH*etae*bstar/(dp*(1+rd));
   omega = N/M;
 end;
+
+//steady; 
+
+//resid;
 
 //   shocks;
 //     var e_ = 0.01^2;
 //    var e_c = 0;
 //     var ee_I = 0.01^2;
-//    var e_sigma = 0.01^2;
+//var e_sigma = 0.01
+//  %  var e_sigma = 0.01^2;
 //   end;
-vcov = [0.00005184 0 0 0 ,
-          0 0 0 0 ,
-          0 0 0 0,
-          0 0 0 0 ];
+
 
 vcov = [0.0000168 0 0 0 ;
           0 0 0 0 ;
-          0 0 0.0001 0;
-          0 0 0 0.0001 ];
+          0 0 .0005 0;
+          0 0 0 0 ];
 order = 3;
 // resid(1);
-// steady(solve_algo = 2);
+ //steady(solve_algo = 1);
 // check;
 // for i=1:length(oo_.steady_state);
 //   fprintf(1,'%-s %10.6f\n',M_.endo_names(i,:),oo_.steady_state(i));

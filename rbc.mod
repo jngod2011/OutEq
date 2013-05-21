@@ -44,6 +44,7 @@ var
   w //  real wage
   e_I
   sigma_I
+  q
 ;
 
 //  exogenous shock
@@ -76,6 +77,7 @@ rhoc = 0.6;
 sigma = 1;
 sigma2 = ((0.007/(1-alpha)))^2;
 cstar = 0.000825;
+//cstar=0.008;
 
 //  Hansen (1985) parameterization
 //beta = 0.99;
@@ -94,17 +96,18 @@ b=0;
 //  equation numbers that dynare gives with the code below
 model; 
 // (use_dll);
+q=1+cstar;
   mU = Zc*((C-b*C(-1))/(1-b))^(-sigma); 
-  mU = beta*mU(+1)*((1-delta) + rK(+1)); 
+  mU = beta*mU(+1)*(q*(1-delta) + rK(+1))/q; 
 //   log(Z) = rho*log(Z(-1)) + e_; 
   Z = rho*Z(-1) + e_; 
   log(Zc)=rhoc*log(Zc(-1)) + e_c; 
   Y = K(-1)^alpha*(exp(Z)*L)^(1-alpha); 
   rK/w = (alpha/(1-alpha))*L/K(-1); 
   rK = alpha*Y/K(-1);
-  K = (1-delta)*K(-1) + I*(1+e_I)/(1+cstar); 
+  K = (1-delta)*K(-1) + I*(1+e_I); 
   L = (w*mU/ksi)^(1/fi); 
-  (C + I) = Y;  //  resource constraint corrected for price dispersion
+  (C + I*(1+cstar)) = Y;  //  resource constraint corrected for monitoring costs
   sigma_I = (1-rho_eI) + rho_eI*sigma_I(-1) + e_sigma; 
   e_I=sigma_I*ee_I; 
 end;
@@ -120,12 +123,15 @@ initval; //  this is the analytical steady state
   e_ = 0;
   e_I = 0;
   sigma_I = 1; 
+ q=1+cstar;
   //  return to capital
-  rK = (1/beta-1+delta);
+ 
+  rK = q*(1/beta-1+delta);
   //  real wage
   w=(1-alpha)*(rK/alpha)^(-alpha/(1-alpha));
   //  capital stock
-  K =((1-alpha)/ksi)^(1/(sigma+fi))*(rK/alpha)^(-(alpha+fi)/((1-alpha)*(sigma+fi)))*(rK/alpha-delta)^(-sigma/(sigma+fi));
+  //K =((1-alpha)/ksi)^(1/(sigma+fi))*(rK/alpha)^(-(alpha+fi)/((1-alpha)*(sigma+fi)))*(rK/alpha-delta*q)^(-sigma/(sigma+fi));
+  K =((1-alpha)/ksi)^(1/(sigma+fi))*(rK/alpha)^(-(alpha+fi)/((1-alpha)*(sigma+fi)))*(rK/alpha-delta*(1+cstar))^(-sigma/(sigma+fi));
   //  labour 
   L=K*(rK/alpha)^(1/(1-alpha));
   //  output
@@ -133,11 +139,13 @@ initval; //  this is the analytical steady state
   //  investments
   I = delta*K;
   //  insider wealth, J = A + N
-  C = Y - I; // -I*chi/pH;
+  C = Y - I*(1+cstar); // -I*chi/pH;
   //  consumption of entrepreneurs
   mU =C^(-sigma);
 end;
 
+//steady;
+//resid;
 //e_, e_A, e_N, e_mu, e_c, e_m, ee_I, e_sigma;
 
 //  shocks;
@@ -159,7 +167,7 @@ vcov = [0.0000168 0 0 0 ;
 order = 3;
            
 
-// resid(1);
+ //resid(1);
 // steady(solve_algo = 2);
 // check;
 // stoch_simul(order=3, irf=40);
