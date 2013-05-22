@@ -32,8 +32,18 @@ myDiffListLabels = {'"$\tilde r^e$" retilde','"$\tilde r^a$" ratilde',...
 verysmallnumber = 1e-12;
 %% run dynare++ if needed
 if rundynarepp
-  system('dynare++ --no-irfs rbc.mod','-echo');
-  system('dynare++ --no-irfs rbcOutEq.mod','-echo');
+  disp('Running dynare++ ...');
+  [status,result] = system('dynare++ --ss-tol 1e-14 --threads 4 --no-irfs rbc.mod','-echo');
+  if ~isempty(result)
+    fprintf(1,'dynare++ gives the following error message:_\n');
+    error('fake','%s\n',result);
+  end;
+  [status,result] = system('dynare++ --ss-tol 1e-14 --threads 4--no-irfs rbcOutEq.mod','-echo');
+  if ~isempty(result)
+    fprintf(1,'dynare++ gives the following error message while running rbcOutEq.mod\n');
+    error('%s\n',result);
+  end;
+  disp('...passed!');
 end;
 %% Load first model
 load(myMod1);
@@ -52,12 +62,16 @@ end;
 db1 = irfpp2db([],irf1,dyn_ss,'eI',cellstr(dyn_vars));
 db1diff = irfpp2db([],irf1,dyn_ss,'eI',cellstr(dyn_vars),'relative',false);
 ss1 = dyn_ss;
-disp('Deterministic Stoch. fix-point Uncoditional mean');
+disp('Holmstrom -- Tirole in Macro with Outside Equity-----------------');
+disp('          Deterministic Stoch. fix-point Uncoditional mean');
 horzcat(cellstr(dyn_vars),num2cell([dyn_steady_states dyn_ss dyn_mean]))
 %% Next scenario
 clear dyn* ex_;
 load(myMod2);
 nShocks = length(dyn_vcov_exo);
+disp('Basic RBC---------------');
+disp('          Deterministic Stoch. fix-point Uncoditional mean');
+horzcat(cellstr(dyn_vars),num2cell([dyn_steady_states dyn_ss dyn_mean]))
 %%  ex post capitalization of investment shock
 ex_=zeros(nShocks,nIrf);
 %ex_(dyn_i_ee_I,1) = -0.1;
