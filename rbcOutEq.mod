@@ -158,7 +158,7 @@ cstar = 0.000825;
 kappa0e = 1;
 kappa0b = 1;
 kappa1e = 100;
-kappa1b = 100;
+kappa1b = 5;
 
 
 //% kappa1e = 10;
@@ -191,8 +191,9 @@ model;
   rd = 0;
   PI = pH*q*Rstar/(1+rd) - pH*etae*bstar/(dp*(1+rd)); //% (15)
   (1/etaw - 1/etab)*(PI - etaw*phie) = (pH*cstar/dp + phib/Qbhat)*(Qbhat-1);
-     kappa0e*(exp(kappa1e*phie)-1) + kappa0e*kappa1e*exp(kappa1e*phie)*phie = 1 - etaw/etab;
-     kappa0b*(exp(kappa1b*phib)-1) + kappa0b*kappa1b*exp(kappa1b*phib)*phib = (pH/dp)*cstar*(Qbhat - 1)/((pH/dp)*cstar*Qbhat + phib/Qbhat);
+  phie = 0; //% only one instrument to the planner; it is phib
+ //%    kappa0e*(exp(kappa1e*phie)-1) + kappa0e*kappa1e*exp(kappa1e*phie)*phie = 1 - etaw/etab;
+ //%    kappa0b*(exp(kappa1b*phib)-1) + kappa0b*kappa1b*exp(kappa1b*phib)*phib = (pH/dp)*cstar*(Qbhat - 1)/((pH/dp)*cstar*Qbhat + phib/Qbhat);
   G = (pH/dp)*(etae*bstar/(etab*(1+rd))) + (1+pH/dp)*cstar - rhobhat 
     + (kappa0e*(exp(kappa1e*phie)-1) - 1 + etaw/etab)*phie 
     + (kappa0b*(exp(kappa1b*phib)-1) - 1 + 1/Qbhat)*phib;
@@ -280,10 +281,12 @@ end;
 
 vcov = [0.0000168 0 0 0 ;
           0 0 0 0 ;
-          0 0 .0008 0;
-          0 0 0 0.001 ];
+          0 0 .00008 0;
+          0 0 0 0.0 ];
 order = 3;
 
+planner_objective (((C)/(1))^(1-sigma))/(1-sigma)-(ksi/(1+fi))*L^(1+fi);
+planner_discount beta; 
 
 //% resid(1);
  //%steady(solve_algo = 1);
