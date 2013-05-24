@@ -157,7 +157,7 @@ cstar = 0.000825;
 //% cstar = 0.825;
 kappa0e = 1;
 kappa0b = 1;
-kappa1e = 100;
+kappa1e = 5;
 kappa1b = 5;
 
 
@@ -168,7 +168,7 @@ kappa1b = 5;
 //% kappa1e = 7;
 //% kappa1b = 11;
 s = ((pH/dp)*(1 - ((1-lambdae)/beta))*bstar + (pH/dp)*(1 - ((1-lambdab)/beta))*cstar + cstar - cstar)/(1+cstar);
-rhobhatbar =   (pH/dp)*(1 - ((1-lambdae)/beta))*bstar + (pH/dp)*(1 - ((1-lambdab)/beta))*cstar + cstar;
+rhobhatbar = (pH/dp)*bstar*(beta-1+lambdae)/beta +(pH/dp)*(beta-1+lambdab)*cstar/beta + cstar; //% this is parsed correctly
 Rstar = R*(1+rhobhatbar)/(1+cstar);
 //%Rstar=R;
 
@@ -266,7 +266,7 @@ initval; //%  this is the analytical steady state
   omega = N/M;
 end;
 
-//%steady; 
+//steady; 
 
 //%resid;
 
@@ -281,7 +281,7 @@ end;
 
 vcov = [0.0000168 0 0 0 ;
           0 0 0 0 ;
-          0 0 .00008 0;
+          0 0 0.0000000001 0;
           0 0 0 0.0 ];
 order = 3;
 
