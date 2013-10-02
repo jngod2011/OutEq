@@ -26,6 +26,10 @@
 //% yhtälöiden kohdalla.   Nyt sain mielestäni bugit korjattua: 
 //% residuaalit menevät nollille. 
 //% 
+//% Antti 2.10.2013
+//% - Testing the pruning algorithm and trying to find the ristky 
+//% steady state using the unstable (1.10.2013) version of Dynare
+//%
 
 
 //%  Define variables, parameters, shocks, etc.
@@ -192,8 +196,8 @@ model;
   PI = pH*q*Rstar/(1+rd) - pH*etae*bstar/(dp*(1+rd)); //% (15)
   (1/etaw - 1/etab)*(PI - etaw*phie) = (pH*cstar/dp + phib/Qbhat)*(Qbhat-1);
   phie = 0; //% only one instrument to the planner; it is phib
- //%    kappa0e*(exp(kappa1e*phie)-1) + kappa0e*kappa1e*exp(kappa1e*phie)*phie = 1 - etaw/etab;
- //%    kappa0b*(exp(kappa1b*phib)-1) + kappa0b*kappa1b*exp(kappa1b*phib)*phib = (pH/dp)*cstar*(Qbhat - 1)/((pH/dp)*cstar*Qbhat + phib/Qbhat);
+  kappa0e*(exp(kappa1e*phie)-1) + kappa0e*kappa1e*exp(kappa1e*phie)*phie = 1 - etaw/etab; //% should be removed if studying planner's problem
+  kappa0b*(exp(kappa1b*phib)-1) + kappa0b*kappa1b*exp(kappa1b*phib)*phib = (pH/dp)*cstar*(Qbhat - 1)/((pH/dp)*cstar*Qbhat + phib/Qbhat); //% should be removed if studying planner's problem
   G = (pH/dp)*(etae*bstar/(etab*(1+rd))) + (1+pH/dp)*cstar - rhobhat 
     + (kappa0e*(exp(kappa1e*phie)-1) - 1 + etaw/etab)*phie 
     + (kappa0b*(exp(kappa1b*phib)-1) - 1 + 1/Qbhat)*phib;
@@ -279,19 +283,22 @@ end;
 //%   end;
 
 
-vcov = [0.0000168 0 0 0 ;
-          0 0 0 0 ;
-          0 0 0.00000005 0;
-          0 0 0 0.0 ];
-order = 3;
+% vcov = [0.0000168 0 0 0 ;
+%           0 0 0 0 ;
+%           0 0 0.00000005 0;
+%           0 0 0 0.0 ];
+% order = 3;
 
-planner_objective (((C)/(1))^(1-sigma))/(1-sigma)-(ksi/(1+fi))*L^(1+fi);
-planner_discount beta; 
+//%planner_objective (((C)/(1))^(1-sigma))/(1-sigma)-(ksi/(1+fi))*L^(1+fi);
+//%planner_discount beta; 
 
-//% resid(1);
- //%steady(solve_algo = 1);
-//% check;
-//% for i=1:length(oo_.steady_state);
-//%   fprintf(1,'%-s %10.6f\n',M_.endo_names(i,:),oo_.steady_state(i));
-//% end;
-//% stoch_simul(order=3, irf=400) ;
+resid(1);
+steady(solve_algo = 1);
+check;
+for i=1:length(oo_.steady_state);
+	fprintf(1,'%-s %10.6f\n',M_.endo_names(i,:),oo_.steady_state(i));
+end;
+options_.risky_steadystate = 1;
+stoch_simul(order=3, irf=0) ;
+
+disp('Haloo!');
